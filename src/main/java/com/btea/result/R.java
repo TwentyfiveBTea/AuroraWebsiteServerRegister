@@ -1,0 +1,50 @@
+package com.btea.result;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Author: TwentyFiveBTea
+ * @Date: 2024/09/12 20:17
+ * @Description: 封装统一响应体
+ */
+@Data
+public class R implements Serializable {
+    // 返回码
+    private int code;
+    // 返回信息
+    private String msg;
+
+    // 返回数据
+    private List<Map<String, Object>> data = new ArrayList<>();
+
+    private R() {
+    }
+
+    public static R ok() {
+        R r = new R();
+        r.setCode(200);
+        r.setMsg("操作成功");
+        return r;
+    }
+
+    public static R serverError() {
+        R r = new R();
+        r.setCode(ResultCodeEnum.SERVERERROR.getCode());
+        r.setMsg(ResultCodeEnum.SERVERERROR.getMsg());
+        return r;
+    }
+
+    public static R unprocessableEntity(List<Map<String, Object>> data) {
+        R r = new R();
+        r.setCode(ResultCodeEnum.UNPROCESSABLEENTITY.getCode());
+        r.setMsg(ResultCodeEnum.UNPROCESSABLEENTITY.getMsg());
+        r.setData(data);
+        return r;
+    }
+
+}

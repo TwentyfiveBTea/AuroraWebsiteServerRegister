@@ -1,0 +1,73 @@
+package com.btea.controller;
+
+import com.btea.dto.JoinusDto;
+import com.btea.result.R;
+import com.btea.service.JoinusService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Author: TwentyFiveBTea
+ * @Date: 2024/09/12 20:10
+ * @Description: “加入我们” 控制层
+ */
+
+@CrossOrigin
+@RestController
+public class JoinusController {
+    @Autowired
+    private JoinusService joinusService;
+
+    @ApiOperation("加入我们接口")
+    @PostMapping("/join")
+    public R join(@RequestParam("name") String name, @RequestParam("gender") String gender,
+                  @RequestParam("grade") String grade, @RequestParam("phone") String phone,
+                  @RequestParam("email") String email, @RequestParam("majors") String majors,
+                  @RequestParam("orientation") String orientation, @RequestParam("introduce") String introduce) {
+
+        JoinusDto joinusDto = new JoinusDto();
+        joinusDto.setName(name);
+        joinusDto.setGender(gender);
+        joinusDto.setGrade(grade);
+        joinusDto.setPhone(phone);
+        joinusDto.setEmail(email);
+        joinusDto.setMajors(majors);
+        joinusDto.setOrientation(orientation);
+        joinusDto.setIntroduce(introduce);
+
+        // 如果年级长度不等于 4
+        if (joinusDto.getGrade().length() != 4) {
+            List<Map<String, Object>> data = Collections.singletonList(
+                    Collections.singletonMap("result", "你这年级确定填对了?")
+            );
+            return R.unprocessableEntity(data);
+            // 判断手机号格式
+        } else if (!joinusDto.getPhone().matches("^1[3|4|5|7|8][0-9]{9}$")) {
+            List<Map<String, Object>> data = Collections.singletonList(
+                    Collections.singletonMap("result", "你这手机号不对吧...")
+            );
+            return R.unprocessableEntity(data);
+            // 判断邮箱格式
+        } else if (!joinusDto.getEmail().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$")) {
+            List<Map<String, Object>> data = Collections.singletonList(
+                    Collections.singletonMap("result", "你这邮箱不对吧...")
+            );
+            return R.unprocessableEntity(data);
+        }
+
+        int i = joinusService.insertMember(joinusDto);
+        if (i == 1) {
+            return R.ok();
+        } else {
+            return R.serverError();
+        }
+    }
+}
